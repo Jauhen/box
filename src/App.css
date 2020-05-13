@@ -36,3 +36,46 @@
     transform: rotate(360deg);
   }
 }
+
+
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.leftPanel {
+  flex: 0 0 250px;
+  padding: 16px;
+}
+
+.leftPanel>div {
+  margin: 10px 10px;
+}
+
+.rightPanel {
+  flex: 2 1 67%;
+  overflow: auto;
+  height: 100vh;
+}
+
+
+.boxesContainers {
+  display: flex;
+  height: 100%;
+}
+
+.svgContainer {
+  flex: 1 1 48%;
+}
+
+svg {
+  height: calc(100vh - 4px);
+  width: calc(50vw - 141px);
+}
+
+/* .rightPanel svg {
+  width: 100%;
+  max-width: 8.5in;
+  border: 1px solid red;
+  height: 100%;
+} */
