@@ -109,58 +109,58 @@ function buildRectangle(startX, startY, width, length) {
 function box(width, length, height, thickness, sections, startX, startY) {
   const bottom = buildRectangle(startX, startY, width, length);
 
-  const sideE = buildRectangle(startX, startY, -height, length);
+  const sideE = buildRectangle(startX, startY+thickness, -height, length-2*thickness);
   const sideS = buildRectangle(startX, startY + length, width, height);
-  const sideW = buildRectangle(startX + width, startY, height, length);
+  const sideW = buildRectangle(startX + width, startY+thickness, height, length-2*thickness);
   const sideN = buildRectangle(startX, startY, width, -height);
 
   const insideE = buildRectangle(
-    startX - height - thickness,
-    startY + thickness,
-    -height + thickness,
-    length - 2 * thickness
+    startX - height - 4*thickness,
+    startY + 5*thickness,
+    -height + 2*thickness,  // TODO: flap length
+    length - 10 * thickness
   );
   const insideS = buildRectangle(
-    startX + thickness,
-    startY + length + height + thickness,
-    width - 2 * thickness,
-    height - thickness
+    startX + 4*thickness,
+    startY + length + height + 4*thickness,
+    width - 8 * thickness,
+    height - 2*thickness  // TODO: flap length
   );
   const insideW = buildRectangle(
-    startX + width + height + thickness,
-    startY + thickness,
-    height - thickness,
-    length - 2 * thickness
+    startX + width + height + 4*thickness,
+    startY + 4*thickness,
+    height - 2*thickness, // TODO: flap length
+    length - 10 * thickness
   );
   const insideN = buildRectangle(
-    startX + thickness,
-    startY - height - thickness,
-    width - 2 * thickness,
-    -height + thickness
+    startX + 4*thickness,
+    startY - height - 4* thickness,
+    width - 8 * thickness,
+    -height + 2* thickness  // TODO: flap length
   );
 
   const flapEN = buildRectangle(
-    startX - thickness,
-    startY,
-    -height + 2 * thickness,
+    startX,
+    startY+thickness,
+    -height,
     -width / 2
   );
   const flapES = buildRectangle(
-    startX - thickness,
-    startY + length,
-    -height + 2 * thickness,
+    startX,
+    startY + length - thickness,
+    -height,
     width / 2
   );
   const flapWS = buildRectangle(
-    startX + width + thickness,
-    startY + length,
-    height - 2 * thickness,
+    startX + width,
+    startY + length - thickness,
+    height,
     width / 2
   );
   const flapWN = buildRectangle(
-    startX + width + thickness,
-    startY,
-    height - 2 * thickness,
+    startX + width,
+    startY+thickness,
+    height,
     -width / 2
   );
 
@@ -170,17 +170,17 @@ function box(width, length, height, thickness, sections, startX, startY) {
   for (let i = 1; i < sections.length; i++) {
     leftSlots.push(
       buildRectangle(
-        insideE.NE.x,
-        sideE.NE.y + fromTop - thickness,
-        height - thickness,
+        insideE.NW.x,
+        sideE.NE.y + fromTop - 2*thickness,
+        -height + 2* thickness,
         thickness * 2
       )
     );
     rightSlots.push(
       buildRectangle(
         insideW.NE.x,
-        sideW.NE.y + fromTop - thickness,
-        height - thickness,
+        sideW.NE.y + fromTop - 2* thickness,
+        height - 2*thickness,
         thickness * 2
       )
     );
@@ -246,14 +246,14 @@ function box(width, length, height, thickness, sections, startX, startY) {
       -height + 2 * half
     ),
   ];
-  let fromTopInsert = 0;
+  let fromTopInsert = 2* thickness;
   for (let i = 0; i < sections.length; i++) {
     sectionBottoms.push(
       buildRectangle(
-        startX + half,
+        startX + thickness,
         startY + fromTopInsert,
-        width - thickness,
-        sections[i] - half
+        width - 2*thickness,
+        sections[i] - 2* thickness
       )
     );
     insetFlapsLeft.push(

@@ -11,11 +11,11 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      length: 115,
-      width: 57.5,
-      height: 25,
-      thickness: 1.4,
-      sections: [115],
+      length: 100,
+      width: 60,
+      height: 40,
+      thickness: 2,
+      sections: [100],
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSectionsSizeChange = this.handleSectionsSizeChange.bind(this);
