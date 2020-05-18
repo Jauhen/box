@@ -14,6 +14,7 @@ class Box extends React.Component {
       this.props.height,
       this.props.thickness,
       this.props.sections,
+      this.props.flaps,
       this.props.startx,
       this.props.starty
     );
@@ -106,42 +107,52 @@ function buildRectangle(startX, startY, width, length) {
   }
 }
 
-function box(width, length, height, thickness, sections, startX, startY) {
+function box(width, length, height, thickness, sections, flaps, startX, startY) {
   const bottom = buildRectangle(startX, startY, width, length);
 
-  const sideE = buildRectangle(startX, startY+thickness, -height, length-2*thickness);
+  const sideE = buildRectangle(
+    startX,
+    startY + thickness,
+    -height,
+    length - 2 * thickness
+  );
   const sideS = buildRectangle(startX, startY + length, width, height);
-  const sideW = buildRectangle(startX + width, startY+thickness, height, length-2*thickness);
+  const sideW = buildRectangle(
+    startX + width,
+    startY + thickness,
+    height,
+    length - 2 * thickness
+  );
   const sideN = buildRectangle(startX, startY, width, -height);
 
   const insideE = buildRectangle(
-    startX - height - 4*thickness,
-    startY + 5*thickness,
-    -height + 2*thickness,  // TODO: flap length
+    startX - height - 4 * thickness,
+    startY + 5 * thickness,
+    (-height + 2 * thickness) * flaps / 100,
     length - 10 * thickness
   );
   const insideS = buildRectangle(
-    startX + 4*thickness,
-    startY + length + height + 4*thickness,
+    startX + 4 * thickness,
+    startY + length + height + 4 * thickness,
     width - 8 * thickness,
-    height - 2*thickness  // TODO: flap length
+    (height - 2 * thickness) * flaps / 100
   );
   const insideW = buildRectangle(
-    startX + width + height + 4*thickness,
-    startY + 4*thickness,
-    height - 2*thickness, // TODO: flap length
+    startX + width + height + 4 * thickness,
+    startY + 4 * thickness,
+    (height - 2 * thickness) * flaps / 100,
     length - 10 * thickness
   );
   const insideN = buildRectangle(
-    startX + 4*thickness,
-    startY - height - 4* thickness,
+    startX + 4 * thickness,
+    startY - height - 4 * thickness,
     width - 8 * thickness,
-    -height + 2* thickness  // TODO: flap length
+    (-height + 2 * thickness) * flaps / 100
   );
 
   const flapEN = buildRectangle(
     startX,
-    startY+thickness,
+    startY + thickness,
     -height,
     -width / 2
   );
@@ -159,7 +170,7 @@ function box(width, length, height, thickness, sections, startX, startY) {
   );
   const flapWN = buildRectangle(
     startX + width,
-    startY+thickness,
+    startY + thickness,
     height,
     -width / 2
   );
@@ -171,16 +182,16 @@ function box(width, length, height, thickness, sections, startX, startY) {
     leftSlots.push(
       buildRectangle(
         insideE.NW.x,
-        sideE.NE.y + fromTop - 2*thickness,
-        -height + 2* thickness,
+        sideE.NE.y + fromTop - 2 * thickness,
+        -height + 2 * thickness,
         thickness * 2
       )
     );
     rightSlots.push(
       buildRectangle(
         insideW.NE.x,
-        sideW.NE.y + fromTop - 2* thickness,
-        height - 2*thickness,
+        sideW.NE.y + fromTop - 2 * thickness,
+        height - 2 * thickness,
         thickness * 2
       )
     );
@@ -224,124 +235,144 @@ function box(width, length, height, thickness, sections, startX, startY) {
       M ${flapWN.SE} ${flapWN.SW}
       M ${flapWS.NE} ${flapWS.NW}`;
 
-  const half = thickness / 2;
-
   const sectionBottoms = [];
   const sectionBorders = [
-    buildRectangle(startX + half, startY, width - thickness, -height + half),
+    buildRectangle(
+      startX,
+      startY,
+      width - 2 * thickness,
+      -height + 2 * thickness
+    ),
   ];
   const insetFlapsLeft = [
-    buildRectangle(
-      startX + half,
-      startY - half,
-      -sections[0] / 2 + half,
-      -height + 2 * half
-    ),
+    buildRectangle(startX, startY, -sections[0] / 2, -height + 2 * thickness),
   ];
   const insetFlapsRight = [
     buildRectangle(
-      startX + width - half,
-      startY - half,
-      sections[0] / 2 - half,
-      -height + 2 * half
+      startX + width - 2 * thickness,
+      startY,
+      sections[0] / 2,
+      -height + 2 * thickness
     ),
   ];
-  let fromTopInsert = 2* thickness;
+  let fromTopInsert = 0;
   for (let i = 0; i < sections.length; i++) {
     sectionBottoms.push(
       buildRectangle(
         startX + thickness,
         startY + fromTopInsert,
-        width - 2*thickness,
-        sections[i] - 2* thickness
+        width - 4 * thickness,
+        sections[i]
       )
     );
     insetFlapsLeft.push(
       buildRectangle(
-        startX + half,
-        startY + fromTopInsert + half,
-        -height + 2 * half,
-        sections[i] - 3 * half
+        startX + thickness,
+        startY + fromTopInsert + 0.5 * thickness,
+        -height + 2 * thickness,
+        sections[i] - thickness
       )
     );
     insetFlapsRight.push(
       buildRectangle(
-        startX + width - half,
-        startY + fromTopInsert + half,
-        height - 2 * half,
-        sections[i] - 3 * half
+        startX + width - 3 * thickness,
+        startY + fromTopInsert + 0.5 * thickness,
+        height - 2 * thickness,
+        sections[i] - thickness
       )
     );
     sectionBorders.push(
       buildRectangle(
-        startX + half,
-        startY + fromTopInsert + sections[i] - half,
-        width - thickness,
-        height - half
+        startX,
+        startY + fromTopInsert + sections[i],
+        width - 2 * thickness,
+        height - 2 * thickness
       )
     );
     insetFlapsLeft.push(
       buildRectangle(
-        startX + half,
+        startX,
         startY + fromTopInsert + sections[i],
-        -sections[i] / 2 + half,
-        height - 3 * half
+        -sections[i] / 2,
+        height - 2 * thickness
       )
     );
     insetFlapsRight.push(
       buildRectangle(
-        startX + width - half,
+        startX + width - 2 * thickness,
         startY + fromTopInsert + sections[i],
-        sections[i] / 2 - half,
-        height - 3 * half
+        sections[i] / 2,
+        height - 2 * thickness
       )
     );
     if (i < sections.length - 1) {
       sectionBorders.push(
         buildRectangle(
-          startX + half,
-          startY + fromTopInsert + sections[i] + height - half,
-          width - thickness,
-          height - half
+          startX,
+          startY + fromTopInsert + sections[i] + height - 2 * thickness,
+          width - 2 * thickness,
+          height - 2 * thickness
         )
       );
       insetFlapsLeft.push(
         buildRectangle(
-          startX + half,
-          startY + fromTopInsert + sections[i] + height,
-          -sections[i + 1] / 2 + half,
-          height - 3 * half
+          startX,
+          startY + fromTopInsert + sections[i] + height - 2 * thickness,
+          -sections[i + 1] / 2,
+          height - 2 * thickness
         )
       );
       insetFlapsRight.push(
         buildRectangle(
-          startX + width - half,
-          startY + fromTopInsert + sections[i] + height,
-          sections[i + 1] / 2 - half,
-          height - 3 * half
+          startX + width - 2 * thickness,
+          startY + fromTopInsert + sections[i] + height - 2 * thickness,
+          sections[i + 1] / 2,
+          height - 2 * thickness
         )
       );
     }
-    fromTopInsert += sections[i] + 2 * height - 2 * half;
+    fromTopInsert += sections[i] + 2 * height - 4 * thickness;
   }
 
   const insertCut = [
     'M',
     insetFlapsLeft
-      .map((border) => `${border.NW} ${border.NE} ${border.SE} ${border.SW}`)
+      .map((border, index, array) => {
+        let prefix = '';
+        let sufix = '';
+        if (index % 3 === 1) {
+          prefix = `${border.NW.x} ${array[index - 1].SW.y}`;
+          sufix = `${border.SW.x} ${array[index + 1].NW.y}`;
+        }
+        return `${prefix} ${border.NW} ${border.NE} ${border.SE} ${border.SW} ${sufix}`;
+      })
       .join(' '),
     insetFlapsRight
       .reverse()
-      .map((border) => `${border.SE} ${border.SW} ${border.NW} ${border.NE}`)
+      .map((border, index, array) => {
+        let prefix = '';
+        let sufix = '';
+        if (index % 3 === 1) {
+          prefix = `${border.SE.x} ${array[index - 1].NE.y}`;
+          sufix = `${border.NE.x} ${array[index + 1].SE.y}`;
+        }
+        return `${prefix} ${border.SE} ${border.SW} ${border.NW} ${border.NE} ${sufix}`;
+      })
       .join(' '),
     insetFlapsLeft[0].NW,
   ].join(' ');
 
   const insertScore = [
-    `M ${insetFlapsLeft[0].NW} ${insetFlapsLeft[insetFlapsLeft.length - 1].SW}`,
-    `M ${insetFlapsRight[0].SE} ${
-      insetFlapsRight[insetFlapsRight.length - 1].NE
-    }`,
+    insetFlapsLeft
+      .map((border) => {
+        return `M ${border.NW} ${border.SW}`;
+      })
+      .join(' '),
+      insetFlapsRight
+      .map((border) => {
+        return `M ${border.NE} ${border.SE}`;
+      })
+      .join(' '),
     `${sectionBorders
       .flatMap((border) => [
         `M ${border.NE} ${border.NW}`,
@@ -351,12 +382,19 @@ function box(width, length, height, thickness, sections, startX, startY) {
       .join(' ')} `,
   ].join(' ');
 
-  const totalTopWidth = roundToPrecision(insideW.SW.x * 100 - insideE.SE.x * 100) / 100;
-  const totalBottomWidth = roundToPrecision(
-    Math.max(...insetFlapsRight.map((flap) => flap.SW.x)) * 100 -
-    Math.min(...insetFlapsLeft.map((flap) => flap.SE.x))* 100) /100;
+  const totalTopWidth =
+    roundToPrecision(insideW.SW.x * 100 - insideE.SE.x * 100) / 100;
+  const totalBottomWidth =
+    roundToPrecision(
+      Math.max(...insetFlapsRight.map((flap) => flap.SW.x)) * 100 -
+        Math.min(...insetFlapsLeft.map((flap) => flap.SE.x)) * 100
+    ) / 100;
 
- console.log(totalBottomWidth, Math.max(...insetFlapsRight.map((flap) => flap.SW.x)), Math.min(...insetFlapsLeft.map((flap) => flap.SE.x)));
+  console.log(
+    totalBottomWidth,
+    Math.max(...insetFlapsRight.map((flap) => flap.SW.x)),
+    Math.min(...insetFlapsLeft.map((flap) => flap.SE.x))
+  );
 
   return (
     <div className='boxesContainers'>

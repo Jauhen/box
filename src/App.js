@@ -14,8 +14,9 @@ class App extends React.Component {
       length: 100,
       width: 60,
       height: 40,
-      thickness: 2,
-      sections: [100],
+      thickness: 0.43,
+      sections: [100 - 4*0.43],
+      flaps: 50,
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSectionsSizeChange = this.handleSectionsSizeChange.bind(this);
@@ -58,7 +59,7 @@ class App extends React.Component {
 
     if (name === 'length') {
       const sections = this.state.sections.slice();
-      const rest = value ;
+      const rest = value - 4* this.state.thickness ;
       const total = sections.reduce((sum, val) => sum + val);
       for (let i = 0; i < sections.length; i++) {
         sections[i] = roundToPrecision((sections[i] * rest) / total, 0.01);
@@ -87,9 +88,9 @@ class App extends React.Component {
     const sections = this.state.sections.slice();
     sections[index] = value;
     const rest =
-      this.state.length -
+      this.state.length - 4* this.state.thickness;
       sections.slice(0, index + 1).reduce((sum, val) => sum + val);
-    if (rest > 0) {
+    if (rest > 0 && index !== sections.length - 1) {
       const total = sections.slice(index + 1).reduce((sum, val) => sum + val);
       for (let i = index + 1; i < sections.length; i++) {
         sections[i] = roundToPrecision((sections[i] * rest) / total, 0.01);
@@ -204,6 +205,20 @@ class App extends React.Component {
             mm
           </div>
           <div>
+            <label htmlFor='flaps'>Flaps length</label>
+            <br />
+            <input
+              id='flaps'
+              type='number'
+              min='0'
+              max='100'
+              size='3'
+              value={this.state.flaps}
+              onChange={this.handleInputChange}
+            />
+            %
+          </div>
+          <div>
             <a href={this.state.topUrl} download={this.state.topName}>
               Download top box
             </a>
@@ -226,6 +241,7 @@ class App extends React.Component {
             height={this.state.height}
             thickness={this.state.thickness}
             sections={this.state.sections}
+            flaps={this.state.flaps}
             startx={start}
             starty={start}
           />
