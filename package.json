@@ -32,7 +32,7 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "http://jauhen.github.io/box",
+  "homepage": "https://jauhen.github.io/box",
   "devDependencies": {
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
